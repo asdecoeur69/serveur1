@@ -1,0 +1,40 @@
+// Code du serveur Node.js pour enregistrer les demandes de réservation
+
+// Install dependencies: express, body-parser, nodemon (optional for dev)
+const express = require('express');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Endpoint to handle reservation form submissions
+app.post('/submit-reservation', (req, res) => {
+    const reservationData = {
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+        date: req.body.date,
+        time: req.body.time,
+        participants: req.body.participants,
+        services: req.body.services
+    };
+
+    // Save reservation data to a file (you could replace this with a database)
+    fs.appendFile('reservations.json', JSON.stringify(reservationData) + '\n', (err) => {
+        if (err) {
+            console.error('Erreur lors de l\'enregistrement de la réservation:', err);
+            return res.status(500).send('Erreur serveur. Veuillez réessayer plus tard.');
+        }
+        res.send('Réservation enregistrée avec succès !');
+    });
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Serveur lancé sur le port ${PORT}`);
+});
